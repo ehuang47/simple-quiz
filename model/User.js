@@ -1,38 +1,40 @@
+const bcrypt = require("bcryptjs");
 const mongoose = require("../db");
 const Schema = mongoose.Schema;
+
 const userSchema = new Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  answers: [{ type: ObjectId, ref: "Choice" }],
+  results: [{
+    title: {
+      type: String,
+      enum: ['General', 'Food', 'Christmas']
+    },
+    questions: [{
+      q: { type: Schema.Types.ObjectId, ref: "Question" },
+      selection: String
+    }],
+    score: Number,
+    duration: Number,
+  }],
   isAdmin: Boolean,
   gaveFeedback: Boolean
 });
+
+
+userSchema.statics.registerUser = async (body) => {
+  const user = new User(body);
+  user.password = await bcrypt.hash(body.password, 10);
+  await user.save();
+};
+
+// read: find shallow user, and full user (after populate)
+
+// update: given object, update the user and save
+
 const User = mongoose.model("User", userSchema, "user");
 
-const feedbackSchema = new Schema({
-  feedback: [String],
-  rating: [Number]
-});
-const Feedback = mongoose.model("Feedback", feedbackSchema, "feedback");
 
-const quizSchema = new Schema({
-  title: { type: String, required: true },
-  questions: [{ type: ObjectId, ref: "Question" }],
-});
-const Quiz = mongoose.model("Quiz", quizSchema, "quiz");
 
-const questionSchema = new Schema({
-  question: { type: String, required: true },
-  choices: [{ type: ObjectId, ref: "Choice" }],
-  quiz: { type: ObjectId, ref: "Quiz" }
-});
-const Question = mongoose.model("Question", questionSchema, "question");
-
-const choiceSchema = new Schema({
-  choice: { type: String, required: true },
-  question: { type: ObjectId, ref: "Question" },
-  isCorrect: Boolean
-});
-const Choice = mongoose.model("Choice", choiceSchema, "choice");
 
 module.exports = User;

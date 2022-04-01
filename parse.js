@@ -365,35 +365,8 @@ When is Hogmanay (Scottish holiday)? 31st of December
 In which country were the Ugg boots invented? Australia`;
 
 const log = console.log;
-require("dotenv").config();
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
-const uri = process.env.DB_URI;
+const quizzes = questions.split("\n=====\n");
 
-mongoose.connect(uri, {
-  useUnifiedTopology: true,
-  useNewUrlParser: true,
-},
-  (error, data) => {
-    if (error) log(error);
-    else console.log("mongodb connected successfully");
-  }
-);
-
-const quizSchema = new Schema({
-  title: { type: String, enum: ['General', 'Food', 'Christmas'], required: true },
-  questions: [{ type: Schema.Types.ObjectId, ref: "Question" }],
-});
-const Quiz = mongoose.model("Quiz", quizSchema, "quiz");
-
-const questionSchema = new Schema({
-  question: String,
-  choices: [String],
-  correct: String
-});
-const Question = mongoose.model("Question", questionSchema, "question");
-
-// parsing quiz questions and answers string
 const generateQuizzes = async () => {
   const quizzes = questions.split("\n=====\n");
   const quizTitles = ['General', 'Food', 'Christmas'];
@@ -413,7 +386,7 @@ const generateQuizzes = async () => {
     for (const line of q) {
       if (line.substring(line.length - 1) === '?') {
         ques.correct = correctAns[qCount];
-        totalQues.push(new Question(ques));
+        totalQues.push(ques);
         ques = { question: line, choices: [], correct: '' };
         qCount++;
         optionCount = 0;
@@ -422,16 +395,16 @@ const generateQuizzes = async () => {
         optionCount++;
       }
     }
+    console.log(ques);
     ques.correct = correctAns[qCount];
-    totalQues.push(new Question(ques));
-    const queDocs = await Promise.all(totalQues.map(que => { return que.save(); }));
-    const newQuiz = new Quiz({ title: quizTitles[i] });
-    for (const que of queDocs) {
-      newQuiz.questions.push(que._id);
-    }
-    await newQuiz.save();
-    log(`Made quiz ${quizTitles[i]} with length ${queDocs.length}`);
+    totalQues.push(ques);
+    // const queDocs = await Promise.all(totalQues.map(que => { return que.save(); }));
+    // const newQuiz = new Quiz({ title: quizTitles[i] });
+    // for (const que of queDocs) {
+    //   newQuiz.questions.push(que._id);
+    // }
+    // await newQuiz.save();
+    log(`Made quiz ${quizTitles[i]} with length ${totalQues.length}`);
   }
 };
-
 generateQuizzes().then(res => { log("Done making quizzes"); });
