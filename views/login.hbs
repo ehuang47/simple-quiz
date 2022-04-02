@@ -14,16 +14,6 @@
     * {
       text-align: center;
     }
-
-    table {
-      width: 50%;
-    }
-
-    table,
-    th,
-    td {
-      border: 1px solid black;
-    }
   </style>
 </head>
 
@@ -48,6 +38,8 @@
   <h2>Register</h2>
   <form>
     <div class="form-group">
+      <input type="text" class="form-control" placeholder="First Name" id='reg-fn'>
+      <input type="text" class="form-control" placeholder="Last Name" id='reg-ln'>
       <input type="text" class="form-control" placeholder="Username" id='reg-username'>
       <input type="text" class="form-control" placeholder="Password" id='reg-password'>
     </div>
@@ -91,6 +83,8 @@
   const regSubmitBtn = document.getElementById('reg-submit');
   regSubmitBtn.addEventListener('click', function (e) {
     e.preventDefault();
+    const fn = document.getElementById('reg-fn');
+    const ln = document.getElementById('reg-ln');
     const username = document.getElementById('reg-username');
     const password = document.getElementById('reg-password');
 
@@ -98,13 +92,15 @@
       url: "/register",
       type: "POST",
       contentType: "application/json; charset=utf-8",
-      data: JSON.stringify({ username: username.value, password: password.value }),
+      data: JSON.stringify({ username: username.value, password: password.value, firstName: fn.value, lastName: ln.value }),
       success: function (data, textStatus, req) {
         let msg = `<div class="alert alert-danger" role="alert">${data.err}</div>`;
         if (data.success) {
           msg = `<div class="alert alert-success" role="alert">${data.success}</div>`;
           username.value = '';
           password.value = '';
+          fn.value = '';
+          ln.value = '';
         }
         document.body.firstElementChild.innerHTML = msg;
       },
