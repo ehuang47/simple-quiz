@@ -15,7 +15,7 @@ routeController("Feedback");
 
 // when no routes match
 app.use(function (req, res) {
-  res.status(404).send("not found");
+  res.redirect("/");
 });
 
 module.exports = app;

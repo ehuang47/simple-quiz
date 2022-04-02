@@ -25,7 +25,9 @@ const userSchema = new Schema({
 userSchema.statics.registerUser = async (body) => {
   const user = new User(body);
   user.password = await bcrypt.hash(body.password, 10);
-  await user.save();
+  user.isAdmin = false;
+  user.gaveFeedback = false;
+  return await user.save();
 };
 
 // read: find shallow user, and full user (after populate)
