@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+    crossorigin="anonymous">
+  <style>
+    body {
+      margin: 20px;
+    }
+
+    * {
+      text-align: center;
+    }
+
+    div.correct {
+      background-color: palegreen;
+    }
+
+    div.wrong {
+      background-color: palevioletred;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>{{results.title}} Quiz</h2>
+  <h3>{{name}}'s Score: {{results.score}}</h3>
+  <h4>Started: {{results.start}}</h4>
+  <h4>Ended: {{results.end}}</h4>
+  <hr>
+  <ol>
+    {{#each results.questions}}
+      <li>
+        <div>{{this.question}}</div>
+        {{#each this.choices}}
+          <div>{{this}}</div>
+        {{/each}}
+        {{#ifeq this.correct this.selection}}
+          <div class="correct">Your answer: {{this.selection}}</div>
+        {{/ifeq}}
+        {{#ifuneq this.correct this.selection}}
+          <div class="wrong">Your answer: {{this.selection}}</div>
+        {{/ifuneq}}
+
+      </li>
+    {{/each}}
+  </ol>
+
+</body>
+
+
+</html>

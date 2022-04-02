@@ -5,17 +5,22 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
   results: [{
     title: {
       type: String,
       enum: ['General', 'Food', 'Christmas']
     },
     questions: [{
-      q: { type: Schema.Types.ObjectId, ref: "Question" },
+      question: String,
+      choices: [String],
+      correct: String,
       selection: String
     }],
     score: Number,
-    duration: Number,
+    start: Number,
+    end: Number
   }],
   isAdmin: Boolean,
   gaveFeedback: Boolean
