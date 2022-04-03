@@ -8,7 +8,7 @@ const { v4: uuidv4 } = require('uuid');
 let results = null;
 let readyResults = false;
 
-router.get("/quiz/results", (req, res) => {
+router.get("/quiz/results", isLoggedIn, (req, res) => {
   // readyResults checks against users trying to access results when they havent submitted a quiz
   if (readyResults) {
     res.render("results", { results, name: `${currentUser.firstName} ${currentUser.lastName}` });
@@ -16,7 +16,7 @@ router.get("/quiz/results", (req, res) => {
   } else res.render("home");
 });
 
-router.get("/quiz/:title", (req, res) => {
+router.get("/quiz/:title", isLoggedIn, (req, res) => {
   // generate unique 0-19 to select quiz questions
   const indices = new Set();
   while (indices.size < 10) {
@@ -42,7 +42,7 @@ router.get("/quiz/:title", (req, res) => {
 });
 
 //* POST -------------------------------------------------------------------------------------------
-router.post("/quiz", async (req, res) => {
+router.post("/quiz", isLoggedIn, async (req, res) => {
   // tag user selections as correct/incorrect, store them in results, and sum total correct
   const { selections, start, end } = req.body, questions = results.questions;
   let score = 0;

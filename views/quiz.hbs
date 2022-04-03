@@ -26,19 +26,24 @@
   <h2>{{title}} Quiz</h2>
   <h3>Time Remaining: 15:00</h3>
   <hr>
+  <div id="nav" class="container row">
+    {{#each questions}}
+      <button id="{{@index}}">{{@index}}</button>
+    {{/each}}
+  </div>
   <form>
-    <ol>
+    <div>
       {{#each questions}}
-        <li>
+        <div id="q{{@index}}" style="display:none">
           <div>{{this.question}}</div>
           {{#each this.choices}}
             <div class="choice">
               <input type="radio" name="{{../question}}" value="{{this}}"> {{this}}
             </div>
           {{/each}}
-        </li>
+        </div>
       {{/each}}
-    </ol>
+    </div>
     <input type="submit" id="submit">
   </form>
 </body>
@@ -50,6 +55,31 @@
   document.forms[0].addEventListener('click', e => {
     if (e.target.getAttribute("class") === "choice") e.target.firstElementChild.checked = true;
   });
+
+  // all questions except number1 by default are not displayed
+  // when clicking the respective button, that number appears by iterating through all problems and setting them to disappear
+  const buttons = Array.from(document.getElementById("nav").children);
+  const questions = Array.from(document.forms[0].firstElementChild.children);
+  questions[0].style = "";
+
+  for (const question of questions) {
+    const q = question.firstElementChild;
+    // log(questions, q, q.getAttribute("id"));
+    q.innerText = `${Number(question.getAttribute("id").substring(1)) + 1}. ${q.innerText}`;
+  }
+
+  buttons[0].parentElement.addEventListener('click', e => {
+    for (const question of questions) {
+      if (question.getAttribute("id") === `q${e.target.getAttribute("id")}`) question.style = "";
+      else question.style = "display:none";
+    }
+  });
+
+  for (const button of buttons) {
+    button.innerText = Number(button.innerText) + 1;
+  }
+
+  // ------------------------------------------------------------------
 
   let start = new Date().toLocaleString();
   let timeLeft = 1000 * 60 * 15; // 15 minutes
@@ -72,6 +102,7 @@
   };
   const interval = setInterval(countdown, 1000);
 
+  // ------------------------------------------------------------------
   const submitBtn = document.getElementById('submit');
   submitBtn.addEventListener('click', function (e) {
     e.preventDefault();

@@ -11,19 +11,22 @@ const router = new express.Router(),
 let users = null, resultsMap = {};
 
 // for when admin wants to navigate to user's quiz results breakdown
-router.get("/admin/results/:id", (req, res) => {
+router.get("/admin/results/:id", isLoggedIn, (req, res) => {
+  if (!currentUser.isAdmin) return res.redirect("/home");
   const [results, name] = resultsMap[req.params.id];
   res.render("results", { results, name });
 });
 
 // load all user data into memory and render the admin page
-router.get("/admin", async (req, res) => {
+router.get("/admin", isLoggedIn, async (req, res) => {
+  if (!currentUser.isAdmin) return res.redirect("/home");
   users = await User.find().catch(err => log("GET /admin User.find() error"));
   const feedback = await Feedback.find().catch(err => log("GET /admin Feedback.find() error"));
   let sum = 0;
   for (const fb of feedback) {
     sum += fb.rating;
   }
+
   res.render("admin", { users, feedback, average: (sum / feedback.length).toPrecision(3) });
 
   // store mapping of every user's result ID to their name and result for rendering purposes 
@@ -36,7 +39,7 @@ router.get("/admin", async (req, res) => {
 });
 
 // load all static quiz data into memory and render the home page
-router.get("/home", async (req, res) => {
+router.get("/home", isLoggedIn, async (req, res) => {
   if (!quizzes) quizzes = await Quiz.find().populate("questions").catch(err => log("GET /home Quiz.find() error"));
   const titles = [];
   for (const quiz of quizzes) {
@@ -45,7 +48,7 @@ router.get("/home", async (req, res) => {
   res.render("home", { titles: titles });
 });
 
-router.get("/contact", (req, res) => {
+router.get("/contact", isLoggedIn, (req, res) => {
   res.render("contact");
 });
 
