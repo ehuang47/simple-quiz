@@ -14,20 +14,14 @@
     * {
       text-align: center;
     }
-
-    div.correct {
-      background-color: palegreen;
-    }
-
-    div.wrong {
-      background-color: palevioletred;
-    }
   </style>
 </head>
 
 <body>
+  <a href="/home">Take Another Quiz</a>
   <h2>{{results.title}} Quiz</h2>
-  <h3>{{name}}'s Score: {{results.score}}</h3>
+  <h3 id="score" data-score="{{results.score}}">{{name}}'s Score: {{results.score}}</h3>
+  <h3></h3>
   <h4>Started: {{results.start}}</h4>
   <h4>Ended: {{results.end}}</h4>
   <hr>
@@ -38,18 +32,26 @@
         {{#each this.choices}}
           <div>{{this}}</div>
         {{/each}}
-        {{#ifeq this.correct this.selection}}
-          <div class="correct">Your answer: {{this.selection}}</div>
-        {{/ifeq}}
-        {{#ifuneq this.correct this.selection}}
-          <div class="wrong">Your answer: {{this.selection}}</div>
-        {{/ifuneq}}
-
+        <div class="selection">{{this.selection}}</div>
       </li>
     {{/each}}
   </ol>
 
 </body>
+<script>
+  const selections = Array.from(document.getElementsByClassName("selection"));
+  for (const selected of selections) {
+    selected.style = selected.innerText.split(':')[0] === "Correct" ? "background-color:palegreen" : "background-color:palevioletred";
+  }
 
+  const score = document.getElementById("score");
+  if (Number(score.getAttribute('data-score')) >= 6) {
+    score.nextElementSibling.innerText = "You've PASSED!!!";
+    score.nextElementSibling.style = "color:palegreen";
+  } else {
+    score.nextElementSibling.innerText = "You've FAILED!!!";
+    score.nextElementSibling.style = "color:palevioletred";
+  }
+</script>
 
 </html>

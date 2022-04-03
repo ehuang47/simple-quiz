@@ -8,6 +8,7 @@ const userSchema = new Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   results: [{
+    id: String,
     title: {
       type: String,
       enum: ['General', 'Food', 'Christmas']
@@ -19,8 +20,8 @@ const userSchema = new Schema({
       selection: String
     }],
     score: Number,
-    start: Number,
-    end: Number
+    start: String,
+    end: String
   }],
   isAdmin: Boolean,
   gaveFeedback: Boolean
@@ -34,10 +35,6 @@ userSchema.statics.registerUser = async (body) => {
   user.gaveFeedback = false;
   return await user.save();
 };
-
-// read: find shallow user, and full user (after populate)
-
-// update: given object, update the user and save
 
 const User = mongoose.model("User", userSchema, "user");
 

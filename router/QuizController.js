@@ -3,6 +3,7 @@ const router = new express.Router(),
   User = require("../model/User"),
   { isLoggedIn } = require("../middleware/auth"),
   log = console.log;
+const { v4: uuidv4 } = require('uuid');
 
 let results = null;
 let readyResults = false;
@@ -10,9 +11,7 @@ let readyResults = false;
 router.get("/quiz/results", (req, res) => {
   // readyResults checks against users trying to access results when they havent submitted a quiz
   if (readyResults) {
-    //todo res.render("results", { results, name: `${currentUser.firstName} ${currentUser.lastName}` });
-    res.render("results", { results });
-
+    res.render("results", { results, name: `${currentUser.firstName} ${currentUser.lastName}` });
     readyResults = false;
   } else res.render("home");
 });
@@ -38,28 +37,32 @@ router.get("/quiz/:title", (req, res) => {
   }
 
   // start building results for inserting into db & loading results page
-  results = { title: req.params.title, questions, score: 0, start: 0, end: 0 };
+  results = { id: '', title: req.params.title, questions, score: 0, start: 0, end: 0 };
   res.render("quiz", { questions, title: req.params.title });
 });
 
 //* POST -------------------------------------------------------------------------------------------
 router.post("/quiz", async (req, res) => {
-  // store user selections while calculating total correct
+  // tag user selections as correct/incorrect, store them in results, and sum total correct
   const { selections, start, end } = req.body, questions = results.questions;
   let score = 0;
   for (let i = 0; i < 10; i++) {
-    questions[i].selection = selections[i];
-    if (questions[i].correct === selections[i]) score++;
+    const question = questions[i], selected = selections[i];
+    if (question.correct === selected) {
+      score++;
+      question.selection = `Correct: ${selected}`;
+    } else question.selection = `Incorrect: ${selected}`;
   }
 
   // store test duration & score
+  results.id = uuidv4();
   results.score = score;
   results.start = start;
   results.end = end;
-  log(results.score, results.start, results.end);
+  log(results.id, results.score, results.start, results.end);
 
   // storing results so that admin can check them later
-  // await User.findByIdAndUpdate(currentUser._id, { $push: { results } }).catch(err => log("POST /quiz findByIdAndUpdate() error"));
+  await User.findByIdAndUpdate(currentUser._id, { $push: { results: results } }).catch(err => log("POST /quiz findByIdAndUpdate() error\n", err));
 
   /*
   ! this can be used if you dont want to store previous attempts

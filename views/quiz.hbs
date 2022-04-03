@@ -17,6 +17,7 @@
 
     div.choice:hover {
       background-color: cadetblue;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -77,6 +78,7 @@
 
     const inputs = Array.from(document.forms[0].elements);
     const selections = [];
+    let missingSelection = false;
     // loop 4 inputs at a time, and alert if one was left unchecked
 
     for (let i = 0; i < 40; i += 4) {
@@ -88,23 +90,30 @@
           selectedAnswer = true;
         }
       }
-      if (!selectedAnswer) selections.push('');
+      if (!selectedAnswer) {
+        selections.push('');
+        missingSelection = true;
+      }
     }
 
-    let end = new Date().toLocaleString();
-    $.ajax({
-      url: "/quiz",
-      type: "POST",
-      contentType: "application/json; charset=utf-8",
-      data: JSON.stringify({ selections, start, end }),
-      success: function (data, textStatus, req) {
-        log(data);
-        window.location = data.redirect;
-      },
-      error: function (res) {
-        alert(res.responseJSON.errorMsg);
-      }
-    });
+    if (!missingSelection || (missingSelection &&
+      confirm("You haven't answered every question.\nAre you sure you want to submit?"))) {
+
+      let end = new Date().toLocaleString();
+      $.ajax({
+        url: "/quiz",
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify({ selections, start, end }),
+        success: function (data, textStatus, req) {
+          log(data);
+          window.location = data.redirect;
+        },
+        error: function (res) {
+          alert(res.responseJSON.errorMsg);
+        }
+      });
+    }
 
 
   });

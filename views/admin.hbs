@@ -28,126 +28,64 @@
 </head>
 
 <body>
-  <!--
-  <h2>TO DO App</h3>
-    <form>
-      <div class="form-group">
-        <input type="text" class="form-control"
-          placeholder="Please enter name of .json file you wish to load..." id='filename'>
-      </div>
-      <button type="submit" class="btn btn-primary" id='loadFile'>Load</button>
-      <br />
-      <br />
-    </form>
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h2>All Users' Quiz Results</h2>
+        {{#each users}}
+          <table class="table table-striped caption-top">
+            <thead>
+              <tr>
+                {{this.firstName}} {{this.lastName}} ({{this.username}})
+              </tr>
 
-    <form>
-      <div class="form-group">
-        <input type="text" class="form-control" placeholder="Please enter title..." id='title'>
-        <input type="text" class="form-control" placeholder="Please enter description.." id='desc'>
-      </div>
-      <button type="submit" class="btn btn-primary" id='submit'>Submit</button>
-    </form>
-    <br />
-    <hr />
-    <h4> List loaded from: '{{filename}}'</h4>
-    <br />
-
-    <table class="table table-striped" id='list'>
-      <thead>
-        <td>ID</td>
-        <td>Title</td>
-        <td>Time</td>
-        <td>Status</td>
-        <td>Description</td>
-      </thead>
-      <tbody>
-        {{#each list}}
-          <tr>
-            <td>{{this.id}}</td>
-            <td>{{this.title}} </td>
-            <td>{{this.time}} </td>
-            <td>{{this.status}} </td>
-            <td>{{this.description}} </td>
-          </tr>
+              <td>Title</td>
+              <td>Score</td>
+              <td>Start</td>
+              <td>End</td>
+              <td>Results</td>
+            </thead>
+            <tbody>
+              {{#each this.results}}
+                <tr>
+                  <td>{{this.title}}</td>
+                  <td>{{this.score}} </td>
+                  <td>{{this.start}} </td>
+                  <td>{{this.end}} </td>
+                  <td><a href="/admin/results/{{this.id}}">View Breakdown</a></td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
         {{/each}}
-      </tbody>
-    </table>
- -->
-  <h2>User List</h2>
-  <hr />
-  <table>
-    <tbody>
-      {{#each data}}
-        <tr>
-          <td>{{this.name}}</td>
-          <td>{{this.email}}</td>
-          <td>{{this.password}}</td>
-          <!--property value here-->
-        </tr>
-      {{/each}}
-    </tbody>
-  </table>
+      </div>
 
+
+      <div class="col">
+        <h2>All Reviews</h2>
+        <h4>Average Rating: {{average}} stars</h4>
+        <table class="table table-striped">
+          <thead>
+            <td>Rating</td>
+            <td>Feedback</td>
+          </thead>
+          <tbody>
+            {{#each feedback}}
+              <tr>
+                <td>{{this.rating}}</td>
+                <td>{{this.feedback}} </td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </body>
 
 <script>
   const log = console.log;
 
-  const listTable = document.getElementById('list');
-  listTable.addEventListener('click', function (e) {
-    const row = e.target.parentNode.children;
-    // change it client-side to make it look instant
-    row[3].innerText = row[3].innerText === 'FINISH' ? 'NOT FINISH' : 'FINISH';
-    // send put request to server
-    fetch('http://localhost:3000/todo/', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ id: row[0].innerText }),
-    })
-      .then(res => res.json())
-      .then(data => {
-        log(data.msg);
-      })
-      .catch((error) => { console.error('Error:', error); alert("ERROR!"); });
-  }
-  );
-
-  const loadFileBtn = document.getElementById("loadFile");
-  loadFileBtn.addEventListener('click', function (e) {
-    const nameInput = document.getElementById("filename");
-    fetch('http://localhost:3000/load', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ filename: nameInput.value }),
-    })
-      .then(res => res.json())
-      .then(data => {
-        log(data.msg);
-        alert(data.msg);
-      })
-      .catch((error) => { console.error('Error:', error); alert("ERROR!"); });
-  });
-
-  const submitBtn = document.getElementById('submit');
-  submitBtn.addEventListener('click', function (e) {
-    const titleInput = document.getElementById('title');
-    const descInput = document.getElementById('desc');
-
-    fetch('http://localhost:3000/todos', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ title: titleInput.value, description: descInput.value }),
-    })
-      .then(response => response.json())
-      .then(data => { console.log(data.msg); alert(data.msg); })
-      .catch((error) => { console.error('Error:', error); alert('ERROR!'); });
-  })
 </script>
 
 </html>
