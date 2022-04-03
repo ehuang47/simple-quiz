@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+// for validating user input on registration
 const isValidCredentials = function (req, res, next) {
   const vals = Object.values(req.body);
   for (let i = 0, len = vals.length; i < len; i++) {
@@ -11,6 +12,7 @@ const isValidCredentials = function (req, res, next) {
   next();
 };
 
+// for validating user login input
 const isCorrectPassword = async function (loginInfo, userModel) {
   const { username, password } = loginInfo;
   const user = await userModel.findOne({ username });
@@ -25,6 +27,7 @@ const genJWT = (info) => {
   return jwt.sign(info, process.env.JWT_KEY);
 };
 
+// ? never used, but would be for validating GET/POSTs if this was client-side rendered app
 const checkJWT = (req, res, next) => {
   console.log(`GET ${req.url}`);
   try {
@@ -38,6 +41,7 @@ const checkJWT = (req, res, next) => {
   }
 };
 
+// main form of authorization, limited to 1 user and locally hosted
 const isLoggedIn = (req, res, next) => {
   if (currentUser) {
     if (!currentUser.isAdmin && req.url === "/admin") return res.render("home", { err: "Must be an admin to view the admin page." });

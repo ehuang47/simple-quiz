@@ -4,11 +4,12 @@ const router = new express.Router(),
   { isLoggedIn } = require("../middleware/auth"),
   log = console.log;
 
-router.get("/feedback", (req, res) => {
+router.get("/feedback", isLoggedIn, (req, res) => {
   res.render("feedback");
 });
 
-router.post("/feedback", async (req, res) => {
+router.post("/feedback", isLoggedIn, async (req, res) => {
+  // ! should escape text input, req.body.feedback
   if (currentUser.gaveFeedback) res.send({ err: "This account has already submitted feedback." });
   else {
     await Feedback.submitFeedback(req.body).catch(err => log("POST /feedback submitFeedback() error"));
