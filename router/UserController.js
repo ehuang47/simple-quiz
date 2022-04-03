@@ -1,32 +1,51 @@
 const express = require("express");
 const router = new express.Router(),
   User = require("../model/User"),
+  Feedback = require("../model/Feedback"),
   { Quiz } = require("../model/Quiz"),
   { isValidCredentials, isCorrectPassword, genJWT, isLoggedIn } = require("../middleware/auth"),
   log = console.log;
 
 //* GET ------------------------------------------------------------------------------------------
-// res.render("todo", { filename: filename, list: updatedTodos });
 
-router.get("/", (req, res) => {
-  res.render("login");
+let users = null, resultsMap = {};
+
+// for when admin wants to navigate to user's quiz results breakdown
+router.get("/admin/results/:id", (req, res) => {
+  const [results, name] = resultsMap[req.params.id];
+  res.render("results", { results, name });
 });
 
-router.get("/admin", isLoggedIn, (req, res) => {
-  res.render("admin");
+// load all user data into memory and render the admin page
+router.get("/admin", async (req, res) => {
+  users = await User.find().catch(err => log("GET /admin User.find() error"));
+  const feedback = await Feedback.find().catch(err => log("GET /admin Feedback.find() error"));
+  let sum = 0;
+  for (const fb of feedback) {
+    sum += fb.rating;
+  }
+  res.render("admin", { users, feedback, average: (sum / feedback.length).toPrecision(3) });
+
+  // store mapping of every user's result ID to their name and result for rendering purposes 
+  for (const user of users) {
+    const results = user.results;
+    for (const result of results) {
+      resultsMap[result.id] = [result, `${user.firstName} ${user.lastName}`];
+    }
+  }
 });
 
+// load all static quiz data into memory and render the home page
 router.get("/home", async (req, res) => {
   if (!quizzes) quizzes = await Quiz.find().populate("questions").catch(err => log("GET /home Quiz.find() error"));
   const titles = [];
   for (const quiz of quizzes) {
     titles.push(quiz.title);
   }
-  // todo if admin, render admin page which queries for all user data and results
   res.render("home", { titles: titles });
 });
 
-router.get("/contact", isLoggedIn, (req, res) => {
+router.get("/contact", (req, res) => {
   res.render("contact");
 });
 
@@ -49,7 +68,6 @@ router.post("/login", isValidCredentials, async (req, res) => {
 });
 
 // user can sign up using username and password
-// redirects to login page
 router.post("/register", isValidCredentials, async (req, res) => {
   const user = await User.registerUser(req.body).catch(err => {
     log('POST /register hashAndSave() error');

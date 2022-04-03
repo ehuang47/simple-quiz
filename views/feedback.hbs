@@ -14,140 +14,59 @@
     * {
       text-align: center;
     }
-
-    table {
-      width: 50%;
-    }
-
-    table,
-    th,
-    td {
-      border: 1px solid black;
-    }
   </style>
 </head>
 
 <body>
-  <!--
-  <h2>TO DO App</h3>
-    <form>
-      <div class="form-group">
-        <input type="text" class="form-control"
-          placeholder="Please enter name of .json file you wish to load..." id='filename'>
-      </div>
-      <button type="submit" class="btn btn-primary" id='loadFile'>Load</button>
-      <br />
-      <br />
-    </form>
-
-    <form>
-      <div class="form-group">
-        <input type="text" class="form-control" placeholder="Please enter title..." id='title'>
-        <input type="text" class="form-control" placeholder="Please enter description.." id='desc'>
-      </div>
-      <button type="submit" class="btn btn-primary" id='submit'>Submit</button>
-    </form>
-    <br />
-    <hr />
-    <h4> List loaded from: '{{filename}}'</h4>
-    <br />
-
-    <table class="table table-striped" id='list'>
-      <thead>
-        <td>ID</td>
-        <td>Title</td>
-        <td>Time</td>
-        <td>Status</td>
-        <td>Description</td>
-      </thead>
-      <tbody>
-        {{#each list}}
-          <tr>
-            <td>{{this.id}}</td>
-            <td>{{this.title}} </td>
-            <td>{{this.time}} </td>
-            <td>{{this.status}} </td>
-            <td>{{this.description}} </td>
-          </tr>
-        {{/each}}
-      </tbody>
-    </table>
- -->
-  <h2>User List</h2>
-  <hr />
-  <table>
-    <tbody>
-      {{#each data}}
-        <tr>
-          <td>{{this.name}}</td>
-          <td>{{this.email}}</td>
-          <td>{{this.password}}</td>
-          <!--property value here-->
-        </tr>
-      {{/each}}
-    </tbody>
-  </table>
-
+  <h2>Submit Feedback</h2>
+  <hr>
+  <form>
+    <label for="rating">Give us a rating!</label>
+    <select name="rating" required>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
+    <br>
+    <textarea placeholder="Submit feedback here." rows="4" cols="100"></textarea>
+    <br>
+    <input type="submit" id="submit">
+  </form>
 </body>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
   const log = console.log;
 
-  const listTable = document.getElementById('list');
-  listTable.addEventListener('click', function (e) {
-    const row = e.target.parentNode.children;
-    // change it client-side to make it look instant
-    row[3].innerText = row[3].innerText === 'FINISH' ? 'NOT FINISH' : 'FINISH';
-    // send put request to server
-    fetch('http://localhost:3000/todo/', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ id: row[0].innerText }),
-    })
-      .then(res => res.json())
-      .then(data => {
-        log(data.msg);
-      })
-      .catch((error) => { console.error('Error:', error); alert("ERROR!"); });
-  }
-  );
-
-  const loadFileBtn = document.getElementById("loadFile");
-  loadFileBtn.addEventListener('click', function (e) {
-    const nameInput = document.getElementById("filename");
-    fetch('http://localhost:3000/load', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ filename: nameInput.value }),
-    })
-      .then(res => res.json())
-      .then(data => {
-        log(data.msg);
-        alert(data.msg);
-      })
-      .catch((error) => { console.error('Error:', error); alert("ERROR!"); });
-  });
-
   const submitBtn = document.getElementById('submit');
   submitBtn.addEventListener('click', function (e) {
-    const titleInput = document.getElementById('title');
-    const descInput = document.getElementById('desc');
+    e.preventDefault();
 
-    fetch('http://localhost:3000/todos', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ title: titleInput.value, description: descInput.value }),
-    })
-      .then(response => response.json())
-      .then(data => { console.log(data.msg); alert(data.msg); })
-      .catch((error) => { console.error('Error:', error); alert('ERROR!'); });
-  })
+    let isValid = false;
+    const form = document.forms[0].elements;
+    const review = { rating: Number(form[0].value), feedback: form[1].value };
+    if (review.feedback && review.rating) {
+      $.ajax({
+        url: "/feedback",
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(review),
+        success: function (data, textStatus, req) {
+          if (data.err) alert(data.err);
+          else {
+            alert(data.success);
+            form[0].value = '1';
+            form[1].value = '';
+          }
+        },
+        error: function (res) {
+          alert(res.responseJSON.errorMsg);
+        }
+      });
+    } else alert("Please enter text as feedback.");
+  });
 </script>
 
 </html>
