@@ -23,8 +23,15 @@
 </head>
 
 <body>
+  <header>
+    <nav class="navbar nav-fill navbar-expand-lg navbar-light bg-light">
+      <a class="nav-item nav-link" href="/home">Home</a>
+      <a class="nav-item nav-link" href="/feedback">Feedback</a>
+      <a class="nav-item nav-link" href="/contact">Contact Us</a>
+    </nav>
+  </header>
   <h2>{{title}} Quiz</h2>
-  <h3>Time Remaining: 15:00</h3>
+  <h3 id="timer">Time Remaining: 15:00</h3>
   <hr>
   <div id="nav" class="container row">
     {{#each questions}}
@@ -134,7 +141,7 @@
 
   const countdown = function () {
     timeLeft -= 1000;
-    const timer = document.body.firstElementChild.nextElementSibling;
+    const timer = document.getElementById("timer");
     const min = String(Math.floor(timeLeft / 60 / 1000)).padStart(2, '0');
     const sec = min == '00' ?
       String(Math.floor((timeLeft / 1000))).padStart(2, '0') :
