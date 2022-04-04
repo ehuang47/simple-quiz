@@ -1,11 +1,10 @@
-<!DOCTYPE html>
 <html>
 
 <head>
   <link rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-    crossorigin="anonymous">
+    crossorigin="anonymous" />
   <style>
     body {
       margin: 20px;
@@ -22,7 +21,8 @@
     table,
     th,
     td {
-      border: 1px solid black;
+      border:
+        1px solid black;
     }
   </style>
 </head>
@@ -36,7 +36,9 @@
           <table class="table table-striped caption-top">
             <thead>
               <tr>
-                {{this.firstName}} {{this.lastName}} ({{this.username}})
+                {{this.firstName}}
+                {{this.lastName}}
+                ({{this.username}})
               </tr>
 
               <td>Title</td>
@@ -60,10 +62,9 @@
         {{/each}}
       </div>
 
-
       <div class="col">
         <h2>All Reviews</h2>
-        <h4>Average Rating: {{average}} stars</h4>
+        <h4>Average Rating: {{average}} ★</h4>
         <table class="table table-striped">
           <thead>
             <td>Rating</td>

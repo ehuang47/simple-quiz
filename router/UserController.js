@@ -72,6 +72,11 @@ router.post("/login", isValidCredentials, async (req, res) => {
 
 });
 
+router.post("/logout", isLoggedIn, (req, res) => {
+  currentUser = null;
+  res.send({ msg: "Successfully logged out!" });
+});
+
 // user can sign up using username and password
 router.post("/register", isValidCredentials, async (req, res) => {
   const user = await User.registerUser(req.body).catch(err => {
