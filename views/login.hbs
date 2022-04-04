@@ -19,12 +19,11 @@
 
 <body>
   <div class="message">
-
+    {{#if err}}
+      <div class="alert alert-danger" role="alert">{{err}}</div>
+    {{/if}}
   </div>
 
-  {{#if err}}
-    <div class="alert alert-danger" role="alert">{{err}}</div>
-  {{/if}}
   <h2>Log In</h2>
   <form>
     <div class="form-group">
@@ -35,19 +34,6 @@
     <button type="submit" class="btn btn-primary" id='login-submit'>Log In</button>
     <br />
   </form>
-
-  <h2>Register</h2>
-  <form>
-    <div class="form-group">
-      <input type="text" class="form-control" placeholder="First Name" id='reg-fn' required>
-      <input type="text" class="form-control" placeholder="Last Name" id='reg-ln' required>
-      <input type="text" class="form-control" placeholder="Username" id='reg-username' required>
-      <input type="password" class="form-control" placeholder="Password" id='reg-password' required>
-    </div>
-    <button type="submit" class="btn btn-primary" id='reg-submit'>Register</button>
-    <br />
-  </form>
-
 </body>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -80,36 +66,6 @@
       }
     });
   });
-
-  const regSubmitBtn = document.getElementById('reg-submit');
-  regSubmitBtn.addEventListener('click', function (e) {
-    e.preventDefault();
-    const fn = document.getElementById('reg-fn');
-    const ln = document.getElementById('reg-ln');
-    const username = document.getElementById('reg-username');
-    const password = document.getElementById('reg-password');
-
-    $.ajax({
-      url: "/register",
-      type: "POST",
-      contentType: "application/json; charset=utf-8",
-      data: JSON.stringify({ username: username.value, password: password.value, firstName: fn.value, lastName: ln.value }),
-      success: function (data, textStatus, req) {
-        let msg = `<div class="alert alert-danger" role="alert">${data.err}</div>`;
-        if (data.success) {
-          msg = `<div class="alert alert-success" role="alert">${data.success}</div>`;
-          username.value = '';
-          password.value = '';
-          fn.value = '';
-          ln.value = '';
-        }
-        document.body.firstElementChild.innerHTML = msg;
-      },
-      error: function (res) {
-        alert(res.responseJSON.errorMsg);
-      }
-    });
-  })
 </script>
 
 </html>
