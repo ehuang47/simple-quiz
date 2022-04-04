@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+    crossorigin="anonymous">
+  <style>
+    body {
+      margin: 20px;
+    }
+
+    * {
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="message">
+    {{#if err}}
+      <div class="alert alert-danger" role="alert">{{err}}</div>
+    {{/if}}
+  </div>
+
+
+  <h2>Register</h2>
+  <form>
+    <div class="form-group">
+      <input type="text" class="form-control" placeholder="First Name" id='reg-fn' required>
+      <input type="text" class="form-control" placeholder="Last Name" id='reg-ln' required>
+      <input type="text" class="form-control" placeholder="Username" id='reg-username' required>
+      <input type="password" class="form-control" placeholder="Password" id='reg-password' required>
+    </div>
+    <button type="submit" class="btn btn-primary" id='reg-submit'>Register</button>
+    <br />
+  </form>
+
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+  const log = console.log;
+
+  const regSubmitBtn = document.getElementById('reg-submit');
+  regSubmitBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    const fn = document.getElementById('reg-fn');
+    const ln = document.getElementById('reg-ln');
+    const username = document.getElementById('reg-username');
+    const password = document.getElementById('reg-password');
+
+    $.ajax({
+      url: "/register",
+      type: "POST",
+      contentType: "application/json; charset=utf-8",
+      data: JSON.stringify({ username: username.value, password: password.value, firstName: fn.value, lastName: ln.value }),
+      success: function (data, textStatus, req) {
+        if (!data.err) {
+          alert(data.success);
+          window.location = data.redirect;
+        } else document.body.firstElementChild.innerHTML =
+          `<div class="alert alert-danger" role="alert">${data.err}</div>`;
+      },
+      error: function (res) {
+        alert(res.responseJSON.errorMsg);
+      }
+    });
+  })
+</script>
+
+</html>

@@ -6,9 +6,11 @@ const router = new express.Router(),
   { isValidCredentials, isCorrectPassword, genJWT, isLoggedIn } = require("../middleware/auth"),
   log = console.log;
 
+let users = null, resultsMap = {};
+
 //* GET ------------------------------------------------------------------------------------------
 
-let users = null, resultsMap = {};
+router.get("/register", (req, res) => res.render("register"));
 
 // for when admin wants to navigate to user's quiz results breakdown
 router.get("/admin/results/:id", isLoggedIn, (req, res) => {
@@ -76,7 +78,7 @@ router.post("/register", isValidCredentials, async (req, res) => {
     log('POST /register hashAndSave() error');
   });
 
-  if (user) res.status(201).send({ success: "Successfully registered." });
+  if (user) res.status(201).send({ success: "Successfully registered.", redirect: "/" });
   else res.status(200).send({ err: "This username has already been registered." });
 });
 

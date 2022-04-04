@@ -28,8 +28,12 @@
   <hr>
   <div id="nav" class="container row">
     {{#each questions}}
-      <button id="{{@index}}">{{@index}}</button>
+      <button id="{{@index}}" class="btn btn-secondary">{{@index}}</button>
     {{/each}}
+  </div>
+  <div id="pnBtn">
+    <button id="prev" style="visibility: hidden;" class="btn btn-dark">Previous</button>
+    <button id="next" class="btn btn-dark">Next</button>
   </div>
   <form>
     <div>
@@ -44,6 +48,8 @@
         </div>
       {{/each}}
     </div>
+
+
     <input type="submit" id="submit">
   </form>
 </body>
@@ -52,32 +58,73 @@
 <script>
   const log = console.log;
 
+  // mark as checked when clicking on row containing option, then highlight the respective button
   document.forms[0].addEventListener('click', e => {
-    if (e.target.getAttribute("class") === "choice") e.target.firstElementChild.checked = true;
+    if (e.target.getAttribute("class") === "choice") {
+      e.target.firstElementChild.checked = true;
+      const id = e.target.parentElement.getAttribute("id").substring(1);
+      document.getElementById(id).className = "btn btn-primary";
+    }
   });
 
-  // all questions except number1 by default are not displayed
-  // when clicking the respective button, that number appears by iterating through all problems and setting them to disappear
+  // adjusting the inner text of buttons and question numbers to index+1
   const buttons = Array.from(document.getElementById("nav").children);
   const questions = Array.from(document.forms[0].firstElementChild.children);
-  questions[0].style = "";
-
   for (const question of questions) {
     const q = question.firstElementChild;
     // log(questions, q, q.getAttribute("id"));
     q.innerText = `${Number(question.getAttribute("id").substring(1)) + 1}. ${q.innerText}`;
   }
-
-  buttons[0].parentElement.addEventListener('click', e => {
-    for (const question of questions) {
-      if (question.getAttribute("id") === `q${e.target.getAttribute("id")}`) question.style = "";
-      else question.style = "display:none";
-    }
-  });
-
   for (const button of buttons) {
     button.innerText = Number(button.innerText) + 1;
   }
+
+  questions[0].style = "";
+  let current = questions[0];
+  const prevBtn = document.getElementById("prev"), nextBtn = document.getElementById("next");
+
+  const updatePointers = function (id) {
+    if (id === 0) {
+      prevBtn.style = "visibility:hidden";
+      nextBtn.style = "";
+    } else if (id === 9) {
+      prevBtn.style = "";
+      nextBtn.style = "visibility:hidden";
+    } else {
+      prevBtn.style = "";
+      nextBtn.style = "";
+    }
+  };
+
+  // listeners for when prev/next is clicked
+  prevBtn.parentElement.addEventListener('click', e => {
+    if (e.target instanceof HTMLButtonElement) {
+      const shift = e.target.getAttribute('id') === 'prev' ? -1 : 1;
+      const id = Number(current.getAttribute('id').substring(1));
+      const newID = id + shift;
+      // prevent from going prev when at #1, and next at #10
+      if (newID !== -1 && newID !== 10) {
+        current.style = "display:none";
+        current = questions[newID];
+        current.style = "";
+        updatePointers(newID);
+      }
+    }
+  });
+
+
+  // all questions except number1 by default are not displayed
+  // when clicking the respective button, set current to disappear and clicked to appear
+  buttons[0].parentElement.addEventListener('click', e => {
+    if (e.target instanceof HTMLButtonElement) {
+      const id = Number(e.target.getAttribute('id'));
+      current.style = "display:none";
+      current = questions[id];
+      current.style = "";
+      updatePointers(id);
+      // log(`Clicked Q${id + 1}, index ${id}`, prev, current, next);
+    }
+  });
 
   // ------------------------------------------------------------------
 
@@ -127,7 +174,7 @@
       }
     }
 
-    if (!missingSelection || (missingSelection &&
+    if (!missingSelection || !timeLeft || (missingSelection &&
       confirm("You haven't answered every question.\nAre you sure you want to submit?"))) {
 
       let end = new Date().toLocaleString();

@@ -1,47 +1,34 @@
-<!DOCTYPE html>
 <html>
 
-<head>
-  <link rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
-    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-    crossorigin="anonymous">
-  <style>
-    body {
-      margin: 20px;
-    }
+	<head>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+			crossorigin="anonymous"
+		/>
+		<style>
+			body { margin: 20px; } * { text-align: center; } table { width: 50%; } table, th, td { border:
+			1px solid black; }
+		</style>
+	</head>
 
-    * {
-      text-align: center;
-    }
+	<body>
+		<header class="container">
+			<nav class="nav">
+				<a class="nav-link" href="/home">Home</a>
+				<a class="nav-link" href="/feedback">Feedback</a>
+				<a class="nav-link" href="/contact">Contact Us</a>
+				<a class="nav-link" href="/login">Logout</a>
+			</nav>
+		</header>
 
-    table {
-      width: 50%;
-    }
+		<ul class="nav">
+			{{#each titles}}
+				<a class="nav-link" href="/quiz/{{this}}">{{this}}</a>
+			{{/each}}
+		</ul>
 
-    table,
-    th,
-    td {
-      border: 1px solid black;
-    }
-  </style>
-</head>
-
-<body>
-  <header class="container">
-    <nav id="nav">
-      <a href="/home">Home</a>
-      <a href="/feedback">Feedback</a>
-      <a href="/contact">Contact Us</a>
-    </nav>
-  </header>
-
-  <ul id="quiz-list">
-    {{#each titles}}
-      <a href="/quiz/{{this}}">{{this}}</a>
-    {{/each}}
-  </ul>
-
-</body>
+	</body>
 
 </html>
