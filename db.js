@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const uri = process.env.DB_URI;
-global.currentUser = null;
 global.quizzes = null;
 mongoose.connect(uri, {
   useUnifiedTopology: true,

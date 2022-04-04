@@ -1,7 +1,7 @@
 const express = require("express");
 const router = new express.Router(),
   User = require("../model/User"),
-  { isLoggedIn } = require("../middleware/auth"),
+  { isLoggedIn, getUser } = require("../middleware/auth"),
   log = console.log;
 const { v4: uuidv4 } = require('uuid');
 
@@ -11,9 +11,10 @@ let readyResults = false;
 router.get("/quiz/results", isLoggedIn, (req, res) => {
   // readyResults checks against users trying to access results when they havent submitted a quiz
   if (readyResults) {
-    res.render("results", { results, name: `${currentUser.firstName} ${currentUser.lastName}` });
+    const user = getUser(req);
+    res.render("results", { results, name: `${user.firstName} ${user.lastName}` });
     readyResults = false;
-  } else res.render("home");
+  } else res.redirect("/home");
 });
 
 router.get("/quiz/:title", isLoggedIn, (req, res) => {
@@ -62,11 +63,13 @@ router.post("/quiz", isLoggedIn, async (req, res) => {
   log(results.id, results.score, results.start, results.end);
 
   // storing results so that admin can check them later
-  await User.findByIdAndUpdate(currentUser._id, { $push: { results: results } }).catch(err => log("POST /quiz findByIdAndUpdate() error\n", err));
+  const user = getUser(req);
+  await User.findByIdAndUpdate(user._id, { $push: { results: results } }).catch(err => log("POST /quiz findByIdAndUpdate() error\n", err));
 
   /*
   ! this can be used if you dont want to store previous attempts
-  const user = await User.findById(currentUser._id).catch(err => log("POST /quiz findById error"));
+  let user = getUser(req);
+  user = await User.findById(user._id).catch(err => log("POST /quiz findById error"));
   const curResults = user.results;
   // check if user has old results for this quiz. if so, remove it and append new results
   let previouslyTaken = curResults.some(res => { return res.title === results.title; });
@@ -74,7 +77,7 @@ router.post("/quiz", isLoggedIn, async (req, res) => {
     const newResults = curResults.filter(res => { return res.title !== results.title; });
     newResults.push(results);
   }
-  await User.findByIdAndUpdate(currentUser._id, { results: newResults }).catch(err => log("POST /quiz findByIdAndUpdate() error"));
+  await User.findByIdAndUpdate(user._id, { results: newResults }).catch(err => log("POST /quiz findByIdAndUpdate() error"));
   */
 
 

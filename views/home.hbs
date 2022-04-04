@@ -43,6 +43,8 @@
       type: "POST",
       contentType: "application/json; charset=utf-8",
       success: function (data, textStatus, req) {
+        document.cookie = "JWT=test;max-age=0;";
+        // console.log(`Cookie: ${document.cookie}`);
         alert(data.msg);
       },
       error: function (res) {

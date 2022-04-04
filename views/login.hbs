@@ -56,6 +56,7 @@
         // store JWT
         if (!data.err) {
           document.cookie = `JWT=${req.getResponseHeader('JWT')}`;
+          // alert(document.cookie);
           window.location = data.redirect;
         } else {
           const msg = `<div class="alert alert-danger" role="alert">${data.err}</div>`;

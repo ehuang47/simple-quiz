@@ -3,26 +3,25 @@ const router = new express.Router(),
   User = require("../model/User"),
   Feedback = require("../model/Feedback"),
   { Quiz } = require("../model/Quiz"),
-  { isValidCredentials, isCorrectPassword, genJWT, isLoggedIn } = require("../middleware/auth"),
+  { isValidCredentials, isCorrectPassword, genJWT, isLoggedIn, isNotLoggedIn, clearUser } = require("../middleware/auth"),
   log = console.log;
 
-let users = null, resultsMap = {};
+const resultsMap = {};
 
 //* GET ------------------------------------------------------------------------------------------
 
-router.get("/register", (req, res) => res.render("register"));
+router.get("/", isNotLoggedIn, (req, res) => res.render("login"));
+router.get("/register", isNotLoggedIn, (req, res) => res.render("register"));
 
 // for when admin wants to navigate to user's quiz results breakdown
 router.get("/admin/results/:id", isLoggedIn, (req, res) => {
-  if (!currentUser.isAdmin) return res.redirect("/home");
   const [results, name] = resultsMap[req.params.id];
   res.render("results", { results, name });
 });
 
 // load all user data into memory and render the admin page
 router.get("/admin", isLoggedIn, async (req, res) => {
-  if (!currentUser.isAdmin) return res.redirect("/home");
-  users = await User.find().catch(err => log("GET /admin User.find() error"));
+  const users = await User.find().catch(err => log("GET /admin User.find() error"));
   const feedback = await Feedback.find().catch(err => log("GET /admin Feedback.find() error"));
   let sum = 0;
   for (const fb of feedback) {
@@ -54,17 +53,18 @@ router.get("/contact", isLoggedIn, (req, res) => {
   res.render("contact");
 });
 
+
 //* POST -------------------------------------------------------------------------------------------
 // user login with username and password
 // if admin, redirect to admin page. else home page
 router.post("/login", isValidCredentials, async (req, res) => {
   const body = req.body;
-  const match = await isCorrectPassword(body, User)
+  const [match, userIsAdmin] = await isCorrectPassword(body, User)
     .catch(err => log('POST /login isCorrectPassword() error'));
 
   if (match) {
     res.setHeader('JWT', genJWT(body));
-    if (currentUser.isAdmin) res.send({ redirect: "/admin" });
+    if (userIsAdmin) res.send({ redirect: "/admin" });
     else res.send({ redirect: "/home" });
   }
   else
@@ -73,7 +73,7 @@ router.post("/login", isValidCredentials, async (req, res) => {
 });
 
 router.post("/logout", isLoggedIn, (req, res) => {
-  currentUser = null;
+  clearUser(req);
   res.send({ msg: "Successfully logged out!" });
 });
 
